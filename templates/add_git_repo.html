@@ -6,38 +6,20 @@
   <div class="large-7 columns">
     <h1>Uploader un document</h1>
     <h3>Dans "{{parent.name}}"</h3>
-    <form action="{% url 'document_put' parent.id %}" method="post"
-            enctype="multipart/form-data" class="dropzone">
+    <form action="{% url 'gitdocument_put' parent.id %}" method="post" class="dropzone">
         {% csrf_token %}
         {{ form.non_field_errors }}
         <div class="alert-box info radius">
           <i class="fi-info"></i>
-          Vous pouvez uploader à peu près n'importe quel type de document. DocHub accepte les pdf, jpg, png, doc(x), ppt(x), odt, et bien plus encore.<br><br>
-          Vous préférez importer votre document depuis Git(Hub) ?
-          <a href="{% url 'gitdocument_put' parent.id %}">Faites ça ici !</a>
+          HELP !
         </div>
-
-        {% with form.file as field %}
-            {% if field.errors %}
-              <small class="error">
-                {% for error in field.errors %}
-                  {{error}}</br>
-                {% endfor %}
-              </small>
-            {% endif %}
-            <div class="panel callout drop-panel">
-                <br>
-                <div class="row">
-                    <div class="small-6 columns">
-                        {{field}}
-                    </div>
-                    <div  class="small-6 columns">
-                    </div>
-                </div>
-            </div>
-
-        {% endwith %}
         {% with form.name as field %}
+            {% include "simple_input.html" %}
+        {% endwith %}
+        {% with form.git_url as field %}
+            {% include "simple_input.html" %}
+        {% endwith %}
+        {% with form.git_path as field %}
             {% include "simple_input.html" %}
         {% endwith %}
         {% with form.year as field %}

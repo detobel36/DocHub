@@ -34,6 +34,9 @@ class Document(OneParent, Taggable):
     original = models.FileField(upload_to='original_document')
     pdf = models.FileField(upload_to='pdf_document')
 
+    git_url = models.CharField(default=None, null=True, max_length=512)
+    git_path = models.CharField(default=None, null=True, max_length=512)
+
     state = models.CharField(max_length=20, default='PREPARING', db_index=True)
     md5 = models.CharField(max_length=32, default='', db_index=True)
 

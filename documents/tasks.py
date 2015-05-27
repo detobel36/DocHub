@@ -21,10 +21,12 @@ import uuid
 join = path.join
 import tempfile
 from pyPdf import PdfFileReader
+import shutil
 
 from django.core.urlresolvers import reverse
-from django.core.files.base import ContentFile
+from django.core.files.base import ContentFile, File
 
+from www.config import BASE_DIR
 from documents.models import Document, Page, DocumentError
 from notify.models import Notification
 from .exceptions import DocumentProcessingError, MissingBinary
@@ -84,7 +86,9 @@ def process_document(self, document_id):
         raise NotImplementedError(document_id, document.state)
         # TODO : clean destination + celery.send_task()
 
-    if document.file_type in ('.pdf', 'application/pdf'):
+    if document.git_url is not None:
+        process_git.delay(document_id)
+    elif document.file_type in ('.pdf', 'application/pdf'):
         document.pdf = document.original
         document.save()
         process_pdf.delay(document_id)
@@ -129,6 +133,48 @@ def checksum(self, document_id):
     return document_id
 
 checksum.throws = (ExisingChecksum,)
+
+
+@doctask
+def generate_pdf(self, document_id):
+    document = Document.objects.get(pk=document_id)
+
+    clone_dir = join('/tmp', 'git-' + str(document_id))
+
+    try:
+        shutil.rmtree(clone_dir)
+    except OSError:
+        pass
+
+    try:
+        clone = subprocess.check_output([
+            'git', 'clone',
+            '--depth', '1',
+            document.git_url,
+            clone_dir
+        ])
+    except OSError:
+        raise MissingBinary("git")
+
+    final_pdf_path = join(clone_dir, document.git_path)
+    with open(join(clone_dir, '.dochub'), 'w') as f:
+        f.write(final_pdf_path)
+
+    shutil.copyfile(join(BASE_DIR, 'documents', 'Makefile'), join(clone_dir, 'Makefile'))
+
+    try:
+        make = subprocess.check_output(['make', '-C', clone_dir])
+    except OSError:
+        raise MissingBinary("make")
+    # except subprocess.CalledProcessError as e:
+
+    document.original.save(str(uuid.uuid4()) + ".pdf", File(open(final_pdf_path)))
+    document.pdf = document.original
+    document.save()
+
+    shutil.rmtree(clone_dir)
+
+    return document_id
 
 
 @doctask
@@ -198,6 +244,15 @@ def finish_file(self, document_id):
     document.save()
 
     return document_id
+
+process_git = chain(
+    generate_pdf.s(),
+    sanity_check.s(),
+    checksum.s(),
+    mesure_pdf_length.s(),
+    preview_pdf.s(),
+    finish_file.s()
+)
 
 process_pdf = chain(
     sanity_check.s(),

@@ -22,7 +22,7 @@ from django.db.models import F
 from documents.models import Document
 from graph.models import Course
 from polydag.models import Node
-from documents.forms import UploadFileForm, FileForm
+from documents.forms import UploadFileForm, FileForm, AddGitRepoForm
 
 from cycle import add_document_to_queue
 
@@ -73,6 +73,49 @@ def upload_file(request, parent_id):
         form = UploadFileForm()
 
     return render(request, 'document_upload.html', {
+        'form': form,
+        'parent': parentNode,
+    })
+
+
+@login_required
+def add_git_repo(request, parent_id):
+    parentNode = get_object_or_404(Node, id=parent_id)
+    if not isinstance(parentNode, Course):
+        raise NotImplementedError("Not a course")
+
+    if request.method == 'POST':
+        form = AddGitRepoForm(request.POST)
+
+        if form.is_valid():
+            course = parentNode
+
+            doc = Document.objects.create(
+                user=request.user,
+                name=form.cleaned_data['name'],
+                description=form.cleaned_data['description'],
+                state="PREPARING",
+                file_type='.pdf',
+                git_url=form.cleaned_data['git_url'],
+                git_path=form.cleaned_data['git_path']
+            )
+
+            course.add_child(doc)
+
+            doc.add_keywords(*form.cleaned_data['tags'])
+            doc.year = form.cleaned_data['year']
+
+            doc.state = 'READY_TO_QUEUE'
+            doc.save()
+
+            add_document_to_queue(doc)
+
+            return HttpResponseRedirect(reverse('course_show', args=[course.slug]))
+
+    else:
+        form = AddGitRepoForm()
+
+    return render(request, 'add_git_repo.html', {
         'form': form,
         'parent': parentNode,
     })

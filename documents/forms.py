@@ -54,3 +54,35 @@ class UploadFileForm(FileForm):
 
 # TODO
 # class UrlFileForm(FileForm):
+
+
+class AddGitRepoForm(forms.Form):
+    name = forms.CharField(required=True, widget=forms.TextInput(attrs={
+        'placeholder': 'Titre (obligatoire)'
+    }))
+
+    git_url = forms.CharField(required=True, widget=forms.TextInput(attrs={
+        'placeholder': 'Url du repo Git (obligatoire)'
+    }))
+
+    git_path = forms.CharField(required=True, widget=forms.TextInput(attrs={
+        'placeholder': 'Chemin vers le .pdf a générer (obligatoire)'
+    }))
+
+    description = forms.CharField(required=False, widget=forms.Textarea(attrs={
+        'placeholder': 'Description (optionnel)'
+    }))
+
+    year = forms.ChoiceField(choices=year_choices())
+
+    tags = forms.ModelMultipleChoiceField(
+        required=False,
+        queryset=Keyword.objects.exclude(name__startswith="20"),
+        widget=forms.SelectMultiple(
+            attrs={
+                'class': 'chosen-select',
+                'data-placeholder': 'Tags (optionnel)',
+                'style': "width: 100%; margin-bottom: 15px;"
+            }
+        )
+    )
