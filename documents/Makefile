@@ -1,7 +1,7 @@
 FINAL_PDF = $(shell cat .dochub)
 ORIGINAL_TEX = $(subst .pdf,.tex,${FINAL_PDF})
-OTHER_TEX = $(shell grep '\\input' ${ORIGINAL_TEX} | sed -E 's/.*\\input\{(.+)\}.*/\1/')
-FIGURES = $(shell grep '\\includegraphics' ${ORIGINAL_TEX} ${OTHER_TEX} | sed -E 's/.*\\includegraphics\{(.+)\}.*/\1/')
+OTHER_TEX = $(shell grep '\\input' "${ORIGINAL_TEX}" | sed -E 's/.*\\input\{(.+)\}.*/\1/')
+FIGURES = $(shell grep '\\includegraphics' "${ORIGINAL_TEX}" ${OTHER_TEX} | sed -E 's/.*\\includegraphics\{(.+)\}.*/\1/')
 
 all: ${FINAL_PDF}
 
