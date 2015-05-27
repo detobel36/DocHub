@@ -27,6 +27,14 @@ Or on Fedora
 
     sudo yum install poppler-utils GraphicsMagick unoconv python-devel libjpeg-devel
 
+If you want to be able to generate pdfs from github repos install thoses dependencies :
+    * a LaTeX suite (we use pdflatex)
+    * lunamark (https://github.com/jgm/lunamark)
+    * graphviz
+    * make
+    * dia
+
+
 ### Installation
 
     # Install dependencies then
