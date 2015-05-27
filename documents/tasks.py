@@ -21,15 +21,15 @@ import uuid
 join = path.join
 import tempfile
 from pyPdf import PdfFileReader
-import shutil
+import os
 
 from django.core.urlresolvers import reverse
 from django.core.files.base import ContentFile, File
 
-from www.config import BASE_DIR
+from www.config import BASE_DIR, LATEX_HOST
 from documents.models import Document, Page, DocumentError
 from notify.models import Notification
-from .exceptions import DocumentProcessingError, MissingBinary
+from documents.exceptions import DocumentProcessingError, MissingBinary
 
 
 class SkipException(StandardError):
@@ -135,44 +135,43 @@ def checksum(self, document_id):
 checksum.throws = (ExisingChecksum,)
 
 
+def ssh(cmd, host=None):
+    if host is None:
+        host = LATEX_HOST
+
+    subprocess.check_output(['ssh', host, cmd])
+
+
 @doctask
 def generate_pdf(self, document_id):
     document = Document.objects.get(pk=document_id)
-
     clone_dir = join('/tmp', 'git-' + str(document_id))
 
-    try:
-        shutil.rmtree(clone_dir)
-    except OSError:
-        pass
+    ssh('rm -rf {}'.format(clone_dir))
+    ssh('git clone --depth 1 {} {}'.format(document.git_url, clone_dir))
 
-    try:
-        clone = subprocess.check_output([
-            'git', 'clone',
-            '--depth', '1',
-            document.git_url,
-            clone_dir
-        ])
-    except OSError:
-        raise MissingBinary("git")
+    subprocess.check_output([
+        'scp',
+        join(BASE_DIR, 'documents', 'Makefile'),
+        "{}:{}".format(LATEX_HOST, clone_dir)
+    ])
 
     final_pdf_path = join(clone_dir, document.git_path)
-    with open(join(clone_dir, '.dochub'), 'w') as f:
-        f.write(final_pdf_path)
+    ssh('echo "{}" > {}'.format(final_pdf_path, join(clone_dir, '.dochub')))
 
-    shutil.copyfile(join(BASE_DIR, 'documents', 'Makefile'), join(clone_dir, 'Makefile'))
+    ssh('make -C {}'.format(clone_dir))
 
-    try:
-        make = subprocess.check_output(['make', '-C', clone_dir])
-    except OSError:
-        raise MissingBinary("make")
-    # except subprocess.CalledProcessError as e:
+    subprocess.check_output([
+        'scp',
+        "{}:{}".format(LATEX_HOST, final_pdf_path),
+        clone_dir,
+    ])
 
-    document.original.save(str(uuid.uuid4()) + ".pdf", File(open(final_pdf_path)))
+    document.original.save(str(uuid.uuid4()) + ".pdf", File(open(clone_dir)))
     document.pdf = document.original
     document.save()
 
-    shutil.rmtree(clone_dir)
+    os.remove(clone_dir)
 
     return document_id
 
