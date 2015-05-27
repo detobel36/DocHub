@@ -159,7 +159,7 @@ def generate_pdf(self, document_id):
     final_pdf_path = join(clone_dir, document.git_path)
     ssh('echo "{}" > {}'.format(final_pdf_path, join(clone_dir, '.dochub')))
 
-    ssh('make -C {}'.format(clone_dir))
+    ssh('cd {} && make'.format(clone_dir))
 
     subprocess.check_output([
         'scp',
