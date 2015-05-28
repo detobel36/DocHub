@@ -139,35 +139,55 @@ def ssh(cmd, host=None):
     if host is None:
         host = LATEX_HOST
 
-    subprocess.check_output(['ssh', host, cmd])
+    cmd_str = ' '.join(cmd)
+
+    subprocess.check_output(['ssh', host, cmd_str])
 
 
 @doctask
 def generate_pdf(self, document_id):
-    document = Document.objects.get(pk=document_id)
-    clone_dir = join('/tmp', 'git-' + str(document_id))
+    def e(s):
+        return s.replace(" ", "\\ ")
 
-    ssh('rm -rf {}'.format(clone_dir))
-    ssh('git clone --depth 1 {} {}'.format(document.git_url, clone_dir))
+    document = Document.objects.get(pk=document_id)
+
+    local_pdf = clone_dir = join('/tmp', 'git-' + str(document_id))
+
+    working_dir = join(clone_dir, path.dirname(document.git_path))
+    produced_pdf = join(clone_dir, document.git_path)
+
+    ssh(['rm', '-rf', clone_dir])
+
+    ssh([
+        'git', 'clone',
+        '--depth', '1',
+        document.git_url,
+        clone_dir,
+    ])
 
     subprocess.check_output([
         'scp',
         join(BASE_DIR, 'documents', 'Makefile'),
-        "{}:{}".format(LATEX_HOST, clone_dir)
+        "{}:{}".format(LATEX_HOST, e(working_dir))
     ])
 
-    final_pdf_path = join(clone_dir, document.git_path)
-    ssh('echo "{}" > {}'.format(final_pdf_path, join(clone_dir, '.dochub')))
+    ssh([
+        'echo', '"{}"'.format(produced_pdf),
+        '>', join(e(working_dir), '.dochub')
+    ])
 
-    ssh('cd {} && make'.format(clone_dir))
+    ssh([
+        'cd', e(working_dir),
+        '&&', 'make'
+    ])
 
     subprocess.check_output([
         'scp',
-        "{}:{}".format(LATEX_HOST, final_pdf_path),
-        clone_dir,
+        "{}:{}".format(LATEX_HOST, e(produced_pdf)),
+        local_pdf,
     ])
 
-    document.original.save(str(uuid.uuid4()) + ".pdf", File(open(clone_dir)))
+    document.original.save(str(uuid.uuid4()) + ".pdf", File(open(local_pdf)))
     document.pdf = document.original
     document.save()
 
