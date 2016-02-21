@@ -12,7 +12,7 @@ const Column = React.createClass({
             }
             p += i;
             return <li data-path={p} onMouseEnter={this.setIndex}>
-                {child.name}
+                {child.item}
             </li>;
         }.bind(this));
         return <li className="columnnav-column">
@@ -31,6 +31,8 @@ const ColumnNav = React.createClass({
         this.setState({path: newPath});
     },
     render: function(){
+        /* Render current path.
+           TODO: be more functional */
         var path = [], node = this.props.root;
         var columns = [<Column parent={this} path="" children={node.children}/>];
         for (var i=0; i<this.state.path.length; i++){
@@ -44,8 +46,16 @@ const ColumnNav = React.createClass({
                 break;
             }
         }
+
+        /* Auto-scroll and width */
+        var columns_width = (this.state.path.length + 1)*200;
+        var left = 640 - columns_width;
+        if (left > 0){
+            left = 0;
+        }
         var style_width = {
-            width: (this.state.path.length + 1)*200+'px',
+            width: columns_width+'px',
+            marginLeft: left+'px'
         };
         return <div className="columnnav">
             <ul style={style_width} className="columnnav-container">
@@ -60,109 +70,109 @@ const ColumnNav = React.createClass({
 const data = {
     name: "Root", 
     children: [
-        {name: "Child 1", children: [
-            {name: "Child A", children: [
-                {name: "Child of A", children: [
-                    {name: "Child of child of A", children: []}
+        {item: "Child 1", children: [
+            {item: "Child A", children: [
+                {item: "Child of A", children: [
+                    {item: "Child of child of A", children: []}
                 ]}
             ]},
-            {name: "Child B", children: []}
+            {item: "Child B", children: []}
         ]},
-        {name: "Child 2", children: [
-            {name: "Child A", children: [
-                {name: "Child of A", children: [
-                    {name: "Child of child of A", children: []}
+        {item: "Child 2", children: [
+            {item: "Child A", children: [
+                {item: "Child of A", children: [
+                    {item: "Child of child of A", children: []}
                 ]}
             ]},
-            {name: "Child B", children: []}
+            {item: "Child B", children: []}
         ]},
-        {name: "Child 3", children: [
-            {name: "Child A", children: [
-                {name: "Child of A", children: [
-                    {name: "Child of child of A", children: []}
+        {item: "Child 3", children: [
+            {item: "Child A", children: [
+                {item: "Child of A", children: [
+                    {item: "Child of child of A", children: []}
                 ]}
             ]},
-            {name: "Child B", children: []}
+            {item: "Child B", children: []}
         ]},
-        {name: "Child 4", children: [{name: "Child A", children: []}]},
-        {name: "Child 5", children: [{name: "Child A", children: []}]},
-        {name: "Child 6", children: [{name: "Child A", children: []}]},
-        {name: "Child 7", children: [{name: "Child A", children: []}]},
-        {name: "Child 8", children: [{name: "Child A", children: []}]},
-        {name: "Child 9", children: [{name: "Child A", children: []}]},
-        {name: "Child 10", children: [{name: "Child A", children: []}]},
-        {name: "Child 11", children: [{name: "Child A", children: []}]},
-        {name: "Child 12", children: [{name: "Child A", children: []}]},
-        {name: "Child 13", children: [{name: "Child A", children: []}]},
-        {name: "Child 14", children: [{name: "Child A", children: []}]},
-        {name: "Child 15", children: [
-            {name: "Child A", children: [
-                {name: "Child of A", children: [
-                    {name: "Child of child of A", children: []}
+        {item: "Child 4", children: [{item: "Child A", children: []}]},
+        {item: "Child 5", children: [{item: "Child A", children: []}]},
+        {item: "Child 6", children: [{item: "Child A", children: []}]},
+        {item: "Child 7", children: [{item: "Child A", children: []}]},
+        {item: "Child 8", children: [{item: "Child A", children: []}]},
+        {item: "Child 9", children: [{item: "Child A", children: []}]},
+        {item: "Child 10", children: [{item: "Child A", children: []}]},
+        {item: "Child 11", children: [{item: "Child A", children: []}]},
+        {item: "Child 12", children: [{item: "Child A", children: []}]},
+        {item: "Child 13", children: [{item: "Child A", children: []}]},
+        {item: "Child 14", children: [{item: "Child A", children: []}]},
+        {item: "Child 15", children: [
+            {item: "Child A", children: [
+                {item: "Child of A", children: [
+                    {item: "Child of child of A", children: []}
                 ]}
             ]},
-            {name: "Child B", children: []}
+            {item: "Child B", children: []}
         ]},
-        {name: "Child 16", children: [{name: "Child A", children: []}]},
-        {name: "Child 17", children: [{name: "Child A", children: []}]},
-        {name: "Child 18", children: [{name: "Child A", children: []}]},
-        {name: "Child 19", children: [{name: "Child A", children: []}]},
-        {name: "Child 20", children: [{name: "Child A", children: []}]},
-        {name: "Child 21", children: [{name: "Child A", children: []}]},
-        {name: "Child 22", children: [{name: "Child A", children: []}]},
-        {name: "Child 23", children: [{name: "Child A", children: []}]},
-        {name: "Child 24", children: [{name: "Child 1", children: [
-            {name: "Child A", children: [
-                    {name: "Child of A", children: [
-                        {name: "Child of child of A", children: []}
+        {item: "Child 16", children: [{item: "Child A", children: []}]},
+        {item: "Child 17", children: [{item: "Child A", children: []}]},
+        {item: "Child 18", children: [{item: "Child A", children: []}]},
+        {item: "Child 19", children: [{item: "Child A", children: []}]},
+        {item: "Child 20", children: [{item: "Child A", children: []}]},
+        {item: "Child 21", children: [{item: "Child A", children: []}]},
+        {item: "Child 22", children: [{item: "Child A", children: []}]},
+        {item: "Child 23", children: [{item: "Child A", children: []}]},
+        {item: "Child 24", children: [{item: "Child 1", children: [
+            {item: "Child A", children: [
+                    {item: "Child of A", children: [
+                        {item: "Child of child of A", children: []}
                     ]}
                 ]},
-                {name: "Child B", children: []}
+                {item: "Child B", children: []}
             ]},
-            {name: "Child 2", children: [
-                {name: "Child A", children: [
-                    {name: "Child of A", children: [
-                        {name: "Child of child of A", children: []}
+            {item: "Child 2", children: [
+                {item: "Child A", children: [
+                    {item: "Child of A", children: [
+                        {item: "Child of child of A", children: []}
                     ]}
                 ]},
-                {name: "Child B", children: []}
+                {item: "Child B", children: []}
             ]},
-            {name: "Child 3", children: [
-                {name: "Child A", children: [
-                    {name: "Child of A", children: [
-                        {name: "Child of child of A", children: []}
+            {item: "Child 3", children: [
+                {item: "Child A", children: [
+                    {item: "Child of A", children: [
+                        {item: "Child of child of A", children: []}
                     ]}
                 ]},
-                {name: "Child B", children: []}
+                {item: "Child B", children: []}
             ]},
-            {name: "Child 4", children: [{name: "Child A", children: []}]},
-            {name: "Child 5", children: [{name: "Child A", children: []}]},
-            {name: "Child 6", children: [{name: "Child A", children: []}]},
-            {name: "Child 7", children: [{name: "Child A", children: []}]},
-            {name: "Child 8", children: [{name: "Child A", children: []}]},
-            {name: "Child 9", children: [{name: "Child A", children: []}]},
-            {name: "Child 10", children: [{name: "Child A", children: []}]},
-            {name: "Child 11", children: [{name: "Child A", children: []}]},
-            {name: "Child 12", children: [{name: "Child A", children: []}]},
-            {name: "Child 13", children: [{name: "Child A", children: []}]},
-            {name: "Child 14", children: [{name: "Child A", children: []}]},
-            {name: "Child 15", children: [
-                {name: "Child A", children: [
-                    {name: "Child of A", children: [
-                        {name: "Child of child of A", children: []}
+            {item: "Child 4", children: [{item: "Child A", children: []}]},
+            {item: "Child 5", children: [{item: "Child A", children: []}]},
+            {item: "Child 6", children: [{item: "Child A", children: []}]},
+            {item: "Child 7", children: [{item: "Child A", children: []}]},
+            {item: "Child 8", children: [{item: "Child A", children: []}]},
+            {item: "Child 9", children: [{item: "Child A", children: []}]},
+            {item: "Child 10", children: [{item: "Child A", children: []}]},
+            {item: "Child 11", children: [{item: "Child A", children: []}]},
+            {item: "Child 12", children: [{item: "Child A", children: []}]},
+            {item: "Child 13", children: [{item: "Child A", children: []}]},
+            {item: "Child 14", children: [{item: "Child A", children: []}]},
+            {item: "Child 15", children: [
+                {item: "Child A", children: [
+                    {item: "Child of A", children: [
+                        {item: "Child of child of A", children: []}
                     ]}
                 ]},
-                {name: "Child B", children: []}
+                {item: "Child B", children: []}
             ]},
-            {name: "Child 16", children: [{name: "Child A", children: []}]},
-            {name: "Child 17", children: [{name: "Child A", children: []}]},
-            {name: "Child 18", children: [{name: "Child A", children: []}]},
-            {name: "Child 19", children: [{name: "Child A", children: []}]},
-            {name: "Child 20", children: [{name: "Child A", children: []}]},
-            {name: "Child 21", children: [{name: "Child A", children: []}]},
-            {name: "Child 22", children: [{name: "Child A", children: []}]},
-            {name: "Child 23", children: [{name: "Child A", children: []}]},
-            {name: "Child 24", children: [{name: "Child A", children: []}]},
+            {item: "Child 16", children: [{item: "Child A", children: []}]},
+            {item: "Child 17", children: [{item: "Child A", children: []}]},
+            {item: "Child 18", children: [{item: "Child A", children: []}]},
+            {item: "Child 19", children: [{item: "Child A", children: []}]},
+            {item: "Child 20", children: [{item: "Child A", children: []}]},
+            {item: "Child 21", children: [{item: "Child A", children: []}]},
+            {item: "Child 22", children: [{item: "Child A", children: []}]},
+            {item: "Child 23", children: [{item: "Child A", children: []}]},
+            {item: "Child 24", children: [{item: "Child A", children: []}]},
         ]},
     ]
 };
