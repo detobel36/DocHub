@@ -15,11 +15,11 @@ const Column = React.createClass({
                 {child.name}
             </li>;
         }.bind(this));
-        return <div className="columnnav-column">
+        return <li className="columnnav-column">
             <ul>
                 {children}
             </ul>
-        </div>;
+        </li>;
     }
 });
 
@@ -37,11 +37,20 @@ const ColumnNav = React.createClass({
             var idx = this.state.path[i];
             path.push(idx);
             node = node.children[idx];
-            columns.push(<Column parent={this} path={path.join(',')}
-                                 children={node.children}/>);
+            if (node){
+                columns.push(<Column parent={this} path={path.join(',')}
+                                     children={node.children}/>);
+            } else {
+                break;
+            }
         }
+        var style_width = {
+            width: (this.state.path.length + 1)*200+'px',
+        };
         return <div className="columnnav">
-            {columns}
+            <ul style={style_width} className="columnnav-container">
+                {columns}
+            </ul>
         </div>;
     }
 });
