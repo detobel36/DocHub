@@ -50,13 +50,8 @@ const ColumnNav = React.createClass({
         /* Auto-scroll and width */
         var columns_width = (this.state.path.length + 1)*200;
         var left = 640 - columns_width;
-        if (left > 0){
-            left = 0;
-        }
-        var style_width = {
-            width: columns_width+'px',
-            marginLeft: left+'px'
-        };
+        if (left > 0){left = 0;}
+        var style_width = {width: columns_width+'px', marginLeft: left+'px'};
         return <div className="columnnav">
             <ul style={style_width} className="columnnav-container">
                 {columns}
@@ -68,7 +63,7 @@ const ColumnNav = React.createClass({
 
 /* Demo ! */
 const data = {
-    name: "Root", 
+    item: "Root",
     children: [
         {item: "Child 1", children: [
             {item: "Child A", children: [
