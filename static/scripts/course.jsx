@@ -195,6 +195,17 @@ const CourseDocumentList = React.createClass({
             return <CourseDocument key={"doc"+doc.id} {...doc} />;
         });
 
+        if (docs.length == 0){
+            return <div>
+                <h3>Il n’y a encore rien dans ce cours…</h3>
+                <p>
+                    Aidez DocHub à s'améliorer, et&nbsp;
+                    <b><a href={Urls['document_put'](this.props.slug)}>postez</a></b>&nbsp;
+                    dès maintenant vos documents !
+                </p>
+            </div>;
+        }
+
         return <div>
             <div className="row">
                 <div className="column small-7">
