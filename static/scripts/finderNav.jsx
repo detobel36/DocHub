@@ -172,4 +172,26 @@ const data = {
     ]
 };
 
-ReactDOM.render(<ColumnNav root={data}/>, document.getElementById("the-demo"));
+const realData2Tree = function(data){
+    var children = data.courses.map(function(c){
+        var url = Urls.course_show(c.slug)
+        return {item: <a href={url}>{c.slug} - {c.name}</a>, children: []};
+    });
+    children = children.concat(data.children.map(realData2Tree));
+    return {
+        'item': <a href={Urls.category_show(data.id)}>{data.name}</a>,
+        'children': children
+    };
+}
+
+$(document).ready(function(){
+    //$.getJSON(Urls.course_tree(), function(data){
+    $.getJSON("/static/course_tree.json", function(data){
+        var tree = realData2Tree(data[0]);
+        console.log(tree);
+        ReactDOM.render(<ColumnNav root={tree}/>,
+                        document.getElementById('the-demo'));
+    });
+});
+
+// ReactDOM.render(<ColumnNav root={data}/>, document.getElementById("the-demo"));
