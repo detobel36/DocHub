@@ -6,7 +6,6 @@
 <div class="row">
   <div class="large-12 columns">
     <p>
-      <strong>
         {% if notification.action.verb == "a posté" %}
           <i class="fi-comment"></i>
         {% elif notification.action.verb == "a édité" %}
@@ -21,20 +20,21 @@
           <i class="fi-x"></i>
         {% endif %}
         <a href="{% url "read_and_redirect" notification.id %}">
-          {% if notification.action.verb == "upload failed" or notification.action.verb == "upload success" %}
-           <img src="{{ notification.action.actor.get_photo }}" class="feed-photo">
-            {% if notification.action.verb == "upload success" %}
-              Votre upload a réussi :
+          <strong>
+            {% if notification.action.verb == "upload failed" or notification.action.verb == "upload success" %}
+             <img src="{{ notification.action.actor.get_photo }}" class="feed-photo">
+              {% if notification.action.verb == "upload success" %}
+                Votre upload a réussi :
+              {% else %}
+                Il y a eu une erreur durant la conversion de
+              {% endif %}
             {% else %}
-              Il y a eu une erreur durant la conversion de
-            {% endif %}
-          {% else %}
-            <img src="{{ notification.action.actor.get_photo }}" class="feed-photo">
-            {{ notification.action.actor.fullname }}
+              <img src="{{ notification.action.actor.get_photo }}" class="feed-photo">
+              {{ notification.action.actor.fullname }}
 
-            {{ notification.action.verb }}
-          {% endif %}
-        </strong>
+              {{ notification.action.verb }}
+            {% endif %}
+          </strong>
           {% if notification.action.action_object %}
                 {{ notification.action.action_object.fullname }}
           {% endif %}
@@ -54,4 +54,3 @@
     </p>
   </div>
 </div>
-
